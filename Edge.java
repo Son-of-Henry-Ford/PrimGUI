@@ -1,3 +1,4 @@
+// добавлено строковое отображение
 class Edge {
     int src, dest, weight;
 
@@ -5,5 +6,10 @@ class Edge {
         this.src = src;
         this.dest = dest;
         this.weight = weight;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + src + ", " + dest + ")";
     }
 }
