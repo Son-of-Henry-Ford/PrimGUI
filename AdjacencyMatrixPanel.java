@@ -10,29 +10,38 @@ class AdjacencyMatrixPanel extends JPanel {
     private RoundedPanel graphPanel; // Панель для отображения графа
     private int size; // Размер матрицы
     private GraphPanel graphDraw;
+    private int speed = 1;
 
     public AdjacencyMatrixPanel() {
         setLayout(new GridBagLayout()); // Устанавливаем компоновщик GridBagLayout для главной панели
         GridBagConstraints gbc = new GridBagConstraints();
 
         // Панель для ввода размера матрицы
-        JPanel sizePanel = new JPanel();
-        JLabel sizeLabel = new JLabel("Enter size of matrix:");
-        RoundedTextArea sizeField = new RoundedTextArea(1, 4, 15);
+        JPanel settingPanel = new JPanel();
 
-        RoundedButton setSizeButton = new RoundedButton("Set Size", 25, new Color(154, 154, 154));
+        JLabel sizeLabel = new JLabel("Enter size of matrix:");
+        RoundedTextArea sizeField = new RoundedTextArea(1, 3, 15);
+        RoundedButton setSizeButton = new RoundedButton("Set Size", 25, new Color(50, 98, 255));
+
+        JLabel speedLabel = new JLabel("Speed of changing steps:");
+        RoundedTextArea speedField = new RoundedTextArea(1, 3, 15);
+        RoundedButton setSpeedButton = new RoundedButton("Set speed", 25, new Color(50, 98, 255));
 
         // Добавляем элементы на панель ввода размера матрицы
-        sizePanel.add(sizeLabel);
-        sizePanel.add(sizeField);
-        sizePanel.add(setSizeButton);
+        settingPanel.add(sizeLabel);
+        settingPanel.add(sizeField);
+        settingPanel.add(setSizeButton);
+
+        settingPanel.add(speedLabel);
+        settingPanel.add(speedField);
+        settingPanel.add(setSpeedButton);
 
         // Добавляем панель ввода размера матрицы
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 4;
         gbc.fill = GridBagConstraints.CENTER;
-        add(sizePanel, gbc);
+        add(settingPanel, gbc);
 
         // Панель для размещения полей ввода матрицы
         matrixPanel = new RoundedPanel(new FlowLayout(), 25, getBackground());
@@ -67,10 +76,23 @@ class AdjacencyMatrixPanel extends JPanel {
         setSizeButton.addActionListener(e -> {
             try {
                 size = Integer.parseInt(sizeField.getText()); // Преобразуем текст из поля ввода в целое число
-                if (size > 10) {
-                    JOptionPane.showMessageDialog(this, "Please enter a number less 11.", "Error", JOptionPane.ERROR_MESSAGE);
+                if (size > 10 || size < 1) {
+                    JOptionPane.showMessageDialog(this, "Please enter a number less 11 and greater than 1.", "Error", JOptionPane.ERROR_MESSAGE);
                 }else {
                     createMatrix(size); // Создаем матрицу указанного размера
+                }
+            } catch (NumberFormatException ex) {
+                // Если введено не число, показываем сообщение об ошибке
+                JOptionPane.showMessageDialog(this, "Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Обработчик нажатия кнопки установки скорости
+        setSpeedButton.addActionListener(e -> {
+            try {
+                speed = Integer.parseInt(speedField.getText()); // Преобразуем текст из поля ввода в целое число
+                if (speed < 0) {
+                    JOptionPane.showMessageDialog(this, "Please enter a number greater than 0.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException ex) {
                 // Если введено не число, показываем сообщение об ошибке
@@ -103,10 +125,10 @@ class AdjacencyMatrixPanel extends JPanel {
 
         // Перемещаем кнопку Calculate MST и Draw Graph в отдельную панель снизу
         JPanel bottomPanel = new JPanel();
-        RoundedButton calculateButton = new RoundedButton("Calculate MST", 20, new Color(154, 154, 154));
+        RoundedButton calculateButton = new RoundedButton("Draw MST", 20, new Color(50, 98, 255));
         calculateButton.addActionListener(e -> calculateMST()); // Добавляем обработчик нажатия кнопки
         bottomPanel.add(calculateButton);
-        RoundedButton drawGraphButton = new RoundedButton("Draw Graph", 20, new Color(154, 154, 154));
+        RoundedButton drawGraphButton = new RoundedButton("Draw Graph", 20, new Color(50, 98, 255));
         drawGraphButton.addActionListener(e -> drawGraph()); // Добавляем обработчик нажатия кнопки
         bottomPanel.add(drawGraphButton);
 
@@ -127,8 +149,14 @@ class AdjacencyMatrixPanel extends JPanel {
                     if (i == j){
                         matrix[i][j] = 0;
                     }
-                    matrix[i][j] = Integer.parseInt(matrixFields[i][j].getText()); // Преобразуем текст из полей ввода в числа
-                    matrix[j][i] = Integer.parseInt(matrixFields[i][j].getText()); //
+                    int num = Integer.parseInt(matrixFields[i][j].getText()); // Преобразуем текст из полей ввода в числа
+                    if (num >= 0) {
+                        matrix[i][j] = num;
+                        matrix[j][i] = num;
+                    }else {
+                        JOptionPane.showMessageDialog(this, "Please enter non-negative numbers", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                 }
             }
         } catch (NumberFormatException ex) {
@@ -147,7 +175,7 @@ class AdjacencyMatrixPanel extends JPanel {
 
         Graphics g = graphPanel.getGraphics();
 
-        int delay = 2500; // Задержка в миллисекундах (2 секунды)
+        int delay = speed*1000; // Задержка в миллисекундах (2 секунды)
         // Создаем новый поток для выполнения операций с GUI
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
@@ -178,8 +206,14 @@ class AdjacencyMatrixPanel extends JPanel {
                     if (i == j){
                         matrix[i][j] = 0;
                     }
-                    matrix[i][j] = Integer.parseInt(matrixFields[i][j].getText()); // Преобразуем текст из полей ввода в числа
-                    matrix[j][i] = Integer.parseInt(matrixFields[i][j].getText()); //
+                    int num = Integer.parseInt(matrixFields[i][j].getText()); // Преобразуем текст из полей ввода в числа
+                    if (num >= 0) {
+                        matrix[i][j] = num;
+                        matrix[j][i] = num;
+                    }else {
+                        JOptionPane.showMessageDialog(this, "Please enter non-negative numbers", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                 }
             }
         } catch (NumberFormatException ex) {
@@ -194,5 +228,4 @@ class AdjacencyMatrixPanel extends JPanel {
         graphPanel.revalidate(); // Перекомпоновываем компоненты
         graphPanel.repaint(); // Перерисовываем компоненты
     }
-
 }

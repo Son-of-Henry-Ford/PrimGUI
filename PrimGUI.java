@@ -29,29 +29,28 @@ public class PrimGUI extends JFrame {
         //filePanel.setBackground(Color.LIGHT_GRAY);
 
         // Добавляем панели на основную панель с указанием имен для карточного компоновщика
+        mainPanel.add(drawingPanel, "Drawing Input");
         mainPanel.add(matrixPanel, "Matrix Input");
-        mainPanel.add(drawingPanel, "Graph Drawing");
         mainPanel.add(filePanel, "File Input");
 
         // Создаем кнопки для переключения между панелями
-        RoundedButton matrixButton = new RoundedButton("Matrix Input", 20, new Color(154, 154, 154));
-        RoundedButton drawButton = new RoundedButton("Graph Drawing", 20, new Color(154, 154, 154));
-        RoundedButton fileButton = new RoundedButton("File Input", 20, new Color(154, 154, 154));
+        RoundedButton drawButton = new RoundedButton("Drawing Input", 20, new Color(50, 98, 255));
+        RoundedButton matrixButton = new RoundedButton("Matrix Input", 20, new Color(50, 98, 255));
+        RoundedButton fileButton = new RoundedButton("File Input", 20, new Color(50, 98, 255));
 
         /*JButton matrixButton = new JButton("Matrix Input");
         JButton drawButton = new JButton("Graph Drawing");
         JButton fileButton = new JButton("File Input");*/
 
         // Добавляем обработчики событий для кнопок
+        drawButton.addActionListener(e -> cardLayout.show(mainPanel, "Drawing Input"));
         matrixButton.addActionListener(e -> cardLayout.show(mainPanel, "Matrix Input"));
-        drawButton.addActionListener(e -> cardLayout.show(mainPanel, "Graph Drawing"));
         fileButton.addActionListener(e -> cardLayout.show(mainPanel, "File Input"));
 
         // Панель для размещения кнопок
         JPanel buttonPanel = new JPanel();
-        //buttonPanel.setBackground(Color.LIGHT_GRAY);
-        buttonPanel.add(matrixButton);
         buttonPanel.add(drawButton);
+        buttonPanel.add(matrixButton);
         buttonPanel.add(fileButton);
 
         // Добавляем панель с кнопками на север, а основную панель на центр окна

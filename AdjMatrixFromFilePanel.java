@@ -15,6 +15,7 @@ public class AdjMatrixFromFilePanel extends JPanel {
     private RoundedPanel graphPanel; // Панель для отображения графа
     private int size; // Размер матрицы
     private GraphPanel graphDraw;
+    private int speed = 1;
 
     public AdjMatrixFromFilePanel() {
         setLayout(new GridBagLayout()); // Устанавливаем компоновщик GridBagLayout для главной панели
@@ -22,7 +23,7 @@ public class AdjMatrixFromFilePanel extends JPanel {
 
         // Панель для кнопки загрузки
         JPanel loadPanel = new JPanel();
-        RoundedButton loadButton = new RoundedButton("Load Matrix from File", 25, new Color(154, 154, 154));
+        RoundedButton loadButton = new RoundedButton("Load Matrix from File", 25, new Color(50, 98, 255));
         loadButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -36,6 +37,18 @@ public class AdjMatrixFromFilePanel extends JPanel {
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(loadPanel, gbc);
+
+        JPanel settingPanel = new JPanel();
+
+        JLabel speedLabel = new JLabel("Speed of changing steps:");
+        RoundedTextArea speedField = new RoundedTextArea(1, 3, 15);
+        RoundedButton setSpeedButton = new RoundedButton("Set speed", 25, new Color(50, 98, 255));
+
+        loadPanel.add(speedLabel);
+        loadPanel.add(speedField);
+        loadPanel.add(setSpeedButton);
+
+        add(settingPanel, gbc);
 
         // Область для вывода результата
         outputArea = new RoundedTextArea(10, 35, 25);
@@ -61,10 +74,10 @@ public class AdjMatrixFromFilePanel extends JPanel {
 
         // Перемещаем кнопку Calculate MST и Draw Graph в отдельную панель снизу
         JPanel bottomPanel = new JPanel();
-        RoundedButton calculateButton = new RoundedButton("Calculate MST", 25, new Color(154, 154, 154));
+        RoundedButton calculateButton = new RoundedButton("Calculate MST", 25, new Color(50, 98, 255));
         calculateButton.addActionListener(e -> calculateMST()); // Добавляем обработчик нажатия кнопки
         bottomPanel.add(calculateButton);
-        RoundedButton drawGraphButton = new RoundedButton("Draw Graph", 25, new Color(154, 154, 154));
+        RoundedButton drawGraphButton = new RoundedButton("Draw Graph", 25, new Color(50, 98, 255));
         drawGraphButton.addActionListener(e -> drawGraph()); // Добавляем обработчик нажатия кнопки
         bottomPanel.add(drawGraphButton);
 
@@ -76,6 +89,19 @@ public class AdjMatrixFromFilePanel extends JPanel {
         gbc.gridy = 4;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(bottomPanel, gbc);
+
+        // Обработчик нажатия кнопки установки скорости
+        setSpeedButton.addActionListener(e -> {
+            try {
+                speed = Integer.parseInt(speedField.getText()); // Преобразуем текст из поля ввода в целое число
+                if (speed < 0) {
+                    JOptionPane.showMessageDialog(this, "Please enter a number greater than 0.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                // Если введено не число, показываем сообщение об ошибке
+                JOptionPane.showMessageDialog(this, "Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 
     // Метод для вычисления MST и вывода результата
@@ -90,7 +116,7 @@ public class AdjMatrixFromFilePanel extends JPanel {
 
         Graphics g = graphPanel.getGraphics();
 
-        int delay = 2500; // Задержка в миллисекундах (2 секунды)
+        int delay = speed*1000; // Задержка в миллисекундах (2 секунды)
         // Создаем новый поток для выполнения операций с GUI
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override

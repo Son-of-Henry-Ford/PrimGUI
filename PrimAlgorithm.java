@@ -57,7 +57,7 @@ public class PrimAlgorithm {
                         continue;
                     }
                     // System.out.printf("%d, %d = %d   ", i, j, matrix[i][j]);
-                    curStep.append(i + "-" + j + " = " + matrix[i][j]+ ", ");
+                    curStep.append("(" + i + ", " + j + ") = " + matrix[i][j]+ ", ");
                     if (matrix[i][j] < minEdge) {
                         minEdge = matrix[i][j];
                         start = i;
@@ -68,10 +68,10 @@ public class PrimAlgorithm {
 
             if (minEdge != Integer.MAX_VALUE) {
                 // System.out.printf("\nADD MIN EDGE = (%d, %d) = %d\n", start, end, minEdge);
-                curStep.append("\nADD MIN EDGE = (" + start + ", " + end + ") = " + minEdge + "\n");
+                curStep.append("\nADD MIN EDGE: (" + start + ", " + end + ") = " + minEdge + "\n");
                 selectedEdges.add(new Edge(start, end, minEdge));
                 // System.out.printf("SELECTED EDGES = %s\n\n", selectedEdges);
-                curStep.append("SELECTED EDGES = " + selectedEdges);
+                curStep.append("SELECTED EDGES: " + selectedEdges);
                 map.put(selectedEdges.getLast(), curStep.toString());
             }
             visitedNodes.add(end);
