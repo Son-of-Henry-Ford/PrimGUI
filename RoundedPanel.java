@@ -40,6 +40,6 @@ public class RoundedPanel extends JPanel {
         } else {
             graphics.setColor(getBackground());
         }
-        graphics.fillRoundRect(15, 15, width - 30, height - 30, arcs.width, arcs.height);
+        graphics.fillRoundRect(10, 10, width - 20, height - 20, arcs.width, arcs.height);
     }
 }

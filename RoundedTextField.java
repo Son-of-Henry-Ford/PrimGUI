@@ -2,11 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 
-public class RoundedTextArea extends JTextArea {
+public class RoundedTextField extends JTextField {
     private int cornerRadius;
 
-    public RoundedTextArea(int rows, int columns, int cornerRadius) {
-        super(rows, columns);
+    public RoundedTextField(int columns, int cornerRadius) {
+        super(columns);
         this.cornerRadius = cornerRadius;
         setOpaque(false); // Сделать компонент прозрачным для отображения закругленных углов
     }
@@ -18,7 +18,7 @@ public class RoundedTextArea extends JTextArea {
 
         // Установить цвет фона
         g2.setColor(getBackground());
-        g2.fill(new RoundRectangle2D.Float(5, 5, getWidth()-10, getHeight()-10, cornerRadius, cornerRadius));
+        g2.fill(new RoundRectangle2D.Float(2, 2, getWidth()-4, getHeight()-4, cornerRadius, cornerRadius));
 
         // Нарисовать текст
         super.paintComponent(g2);
@@ -32,7 +32,7 @@ public class RoundedTextArea extends JTextArea {
 
         // Установить цвет границы
         g2.setColor(getBackground());
-        g2.draw(new RoundRectangle2D.Float(5, 5, getWidth()-10, getHeight()-10, cornerRadius, cornerRadius));
+        g2.draw(new RoundRectangle2D.Float(2, 2, getWidth()-4, getHeight()-4, cornerRadius, cornerRadius));
 
         g2.dispose();
     }
@@ -40,6 +40,6 @@ public class RoundedTextArea extends JTextArea {
     @Override
     public void updateUI() {
         super.updateUI();
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 }

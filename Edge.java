@@ -1,4 +1,3 @@
-// добавлено строковое отображение
 class Edge {
     int src, dest, weight;
 

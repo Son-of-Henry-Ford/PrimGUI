@@ -56,6 +56,7 @@ public class GraphPanel extends JPanel {
                     int weightX = (int) ((1 - offsetFactor) * points[i].x + offsetFactor * points[j].x);
                     int weightY = (int) ((1 - offsetFactor) * points[i].y + offsetFactor * points[j].y);
                     // Рисуем вес ребра
+                    g2.setFont(new Font("Arial", Font.BOLD, 12));
                     g2.setColor(Color.BLUE);
                     g2.drawString(String.valueOf(matrix[i][j]), weightX, weightY);
                 }
@@ -63,7 +64,7 @@ public class GraphPanel extends JPanel {
         }
         // Рисуем вершины
         g2.setColor(Color.getHSBColor(0.65206814F, 0.5829787F, 0.92156863F)); // Устанавливаем цвет для вершин
-        g2.setFont(new Font("Arial", Font.BOLD, 12));
+        g2.setFont(new Font("Arial", Font.BOLD, 14));
         for (int i = 0; i < vertexCount; i++) {
             // Рисуем вершину в виде круга
             g2.fillOval(points[i].x - 15, points[i].y - 15, 30, 30);
@@ -89,7 +90,11 @@ public class GraphPanel extends JPanel {
         // Рисуем вес ребра
         g2.setColor(Color.BLACK);
         g2.setFont(new Font("Arial", Font.BOLD, 12));
-        g2.drawString(String.valueOf(matrix[i][j]), weightX, weightY);
+        if (i > j) { // Чтобы вес рисовался только с одной стороны
+            g2.drawString(String.valueOf(matrix[i][j]), weightX, weightY);
+        }else {
+            g2.drawString(String.valueOf(matrix[j][i]), weightX, weightY);
+        }
 
         g2.setColor(Color.getHSBColor(0.43396372F, 0.67336683F, 0.78039217F)); // Устанавливаем цвет для вершин
 
@@ -98,6 +103,7 @@ public class GraphPanel extends JPanel {
         g2.fillOval(points[j].x - 15, points[j].y - 15, 30, 30);
         g2.setColor(Color.BLACK); // Устанавливаем цвет для текста
         // Рисуем номера вершин
+        g2.setFont(new Font("Arial", Font.BOLD, 14));
         g2.drawString(String.valueOf(i), points[i].x - 5, points[i].y + 5);
         g2.drawString(String.valueOf(j), points[j].x - 5, points[j].y + 5);
     }

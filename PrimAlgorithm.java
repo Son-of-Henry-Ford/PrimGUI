@@ -57,7 +57,7 @@ public class PrimAlgorithm {
                         continue;
                     }
                     // System.out.printf("%d, %d = %d   ", i, j, matrix[i][j]);
-                    curStep.append(i + ", " + j + " = " + matrix[i][j]);
+                    curStep.append(i + "-" + j + " = " + matrix[i][j]+ ", ");
                     if (matrix[i][j] < minEdge) {
                         minEdge = matrix[i][j];
                         start = i;

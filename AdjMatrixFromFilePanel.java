@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map;
 
 
 public class AdjMatrixFromFilePanel extends JPanel {
@@ -20,8 +21,6 @@ public class AdjMatrixFromFilePanel extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
 
         // Панель для кнопки загрузки
-        //RoundedPanel loadPanel = new RoundedPanel(new FlowLayout(), 15, Color.LIGHT_GRAY);
-        //JButton loadButton = new JButton("Load Matrix from File");
         JPanel loadPanel = new JPanel();
         RoundedButton loadButton = new RoundedButton("Load Matrix from File", 25, new Color(154, 154, 154));
         loadButton.addActionListener(new ActionListener() {
@@ -36,11 +35,10 @@ public class AdjMatrixFromFilePanel extends JPanel {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        //loadPanel.setBackground(Color.LIGHT_GRAY);
         add(loadPanel, gbc);
 
         // Область для вывода результата
-        outputArea = new RoundedTextArea(10, 30, 25);
+        outputArea = new RoundedTextArea(10, 35, 25);
         outputArea.setEditable(false); // Запрещаем редактирование области вывода
         JScrollPane scrollPane = new JScrollPane(outputArea); // Добавляем область вывода в прокручиваемую панель
         scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Убираем черную рамку вокруг области
@@ -87,18 +85,31 @@ public class AdjMatrixFromFilePanel extends JPanel {
             return;
         }
 
-        PrimAlgorithm prim = new PrimAlgorithm(size); // Создаем объект алгоритма Прима
-        int[][] mstTree = prim.primMST(matrix); // Вычисляем MST и выводим результат в outputArea
+        PrimAlgorithm prim = new PrimAlgorithm(matrix, size); // Создаем объект алгоритма Прима
+        Map<Edge, String> mstMap = prim.primMST();
 
         Graphics g = graphPanel.getGraphics();
 
-        for (int i = 0; i < mstTree.length; i++) {
-            for (int j = i; j < mstTree[i].length; j++) {
-                if (mstTree[i][j] > 0){
-                    graphDraw.drawEdge(g, i, j);
+        int delay = 2500; // Задержка в миллисекундах (2 секунды)
+        // Создаем новый поток для выполнения операций с GUI
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                for (Edge edge : mstMap.keySet()) {
+                    SwingUtilities.invokeAndWait(() -> {
+                        graphDraw.drawEdge(g, edge.src, edge.dest);
+                        outputArea.setText(mstMap.get(edge));
+                    });
+                    try {
+                        Thread.sleep(delay); // Задержка между итерациями цикла
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
+                return null;
             }
-        }
+        };
+        worker.execute(); // Запускаем SwingWorker
     }
 
     // Метод для рисования графа по матрице смежности
