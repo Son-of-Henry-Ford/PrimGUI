@@ -10,18 +10,20 @@ import java.io.IOException;
 
 public class AdjMatrixFromFilePanel extends JPanel {
     private int[][] matrix;
-    private JTextArea outputArea; // Область для вывода результата выполнения алгоритма Прима
-    private JPanel graphPanel; // Панель для отображения графа
-    private JPanel mstPanel; // Панель для отображения МОД
+    private RoundedTextArea outputArea; // Область для вывода результата выполнения алгоритма Прима
+    private RoundedPanel graphPanel; // Панель для отображения графа
     private int size; // Размер матрицы
+    private GraphPanel graphDraw;
 
     public AdjMatrixFromFilePanel() {
         setLayout(new GridBagLayout()); // Устанавливаем компоновщик GridBagLayout для главной панели
         GridBagConstraints gbc = new GridBagConstraints();
 
         // Панель для кнопки загрузки
+        //RoundedPanel loadPanel = new RoundedPanel(new FlowLayout(), 15, Color.LIGHT_GRAY);
+        //JButton loadButton = new JButton("Load Matrix from File");
         JPanel loadPanel = new JPanel();
-        JButton loadButton = new JButton("Load Matrix from File");
+        RoundedButton loadButton = new RoundedButton("Load Matrix from File", 25, new Color(154, 154, 154));
         loadButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -34,65 +36,77 @@ public class AdjMatrixFromFilePanel extends JPanel {
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        //loadPanel.setBackground(Color.LIGHT_GRAY);
         add(loadPanel, gbc);
 
         // Область для вывода результата
-        outputArea = new JTextArea(10, 30);
+        outputArea = new RoundedTextArea(10, 30, 25);
         outputArea.setEditable(false); // Запрещаем редактирование области вывода
         JScrollPane scrollPane = new JScrollPane(outputArea); // Добавляем область вывода в прокручиваемую панель
+        scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Убираем черную рамку вокруг области
         gbc.gridx = 1;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.fill = GridBagConstraints.CENTER;
         add(scrollPane, gbc); // Добавляем прокручиваемую панель на восток главной панели
 
         // Панель для отображения графа
-        graphPanel = new JPanel();
+        graphPanel = new RoundedPanel(new FlowLayout(), 25, Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        gbc.gridheight = 2;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         add(graphPanel, gbc);
 
-        // Панель отображения мод
-        mstPanel = new JPanel();
-        gbc.gridx = 1; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! если написать = 0, нарисует поверх
-        add(mstPanel, gbc);
-
         // Перемещаем кнопку Calculate MST и Draw Graph в отдельную панель снизу
         JPanel bottomPanel = new JPanel();
-        JButton calculateButton = new JButton("Calculate MST");
+        RoundedButton calculateButton = new RoundedButton("Calculate MST", 25, new Color(154, 154, 154));
         calculateButton.addActionListener(e -> calculateMST()); // Добавляем обработчик нажатия кнопки
         bottomPanel.add(calculateButton);
-        JButton drawGraphButton = new JButton("Draw Graph");
+        RoundedButton drawGraphButton = new RoundedButton("Draw Graph", 25, new Color(154, 154, 154));
         drawGraphButton.addActionListener(e -> drawGraph()); // Добавляем обработчик нажатия кнопки
         bottomPanel.add(drawGraphButton);
 
+        gbc.weightx = 0.0;
+        gbc.weighty = 0.0;
+        gbc.gridwidth = 2;
+        gbc.gridheight = 1;
         gbc.gridx = 0;
         gbc.gridy = 4;
-        gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(bottomPanel, gbc);
     }
 
     // Метод для вычисления MST и вывода результата
     private void calculateMST() {
-        PrimAlgorithm prim = new PrimAlgorithm(size); // Создаем объект алгоритма Прима
-        int[][] mstTree = prim.primMST(matrix, outputArea); // Вычисляем MST и выводим результат в outputArea
+        if (graphDraw == null){
+            JOptionPane.showMessageDialog(this, "Please draw graph fist", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        mstPanel.removeAll(); // Удаляем все компоненты с панели графа
-        mstPanel.setLayout(new BorderLayout()); // Устанавливаем компоновщик BorderLayout для панели графа
-        mstPanel.add(new GraphPanel(mstTree, size)); // Добавляем панель графа с новой матрицей
-        mstPanel.revalidate(); // Перекомпоновываем компоненты
-        mstPanel.repaint(); // Перерисовываем компоненты
+        PrimAlgorithm prim = new PrimAlgorithm(size); // Создаем объект алгоритма Прима
+        int[][] mstTree = prim.primMST(matrix); // Вычисляем MST и выводим результат в outputArea
+
+        Graphics g = graphPanel.getGraphics();
+
+        for (int i = 0; i < mstTree.length; i++) {
+            for (int j = i; j < mstTree[i].length; j++) {
+                if (mstTree[i][j] > 0){
+                    graphDraw.drawEdge(g, i, j);
+                }
+            }
+        }
     }
 
     // Метод для рисования графа по матрице смежности
     private void drawGraph() {
         graphPanel.removeAll(); // Удаляем все компоненты с панели графа
         graphPanel.setLayout(new BorderLayout()); // Устанавливаем компоновщик BorderLayout для панели графа
-        graphPanel.add(new GraphPanel(matrix, size)); // Добавляем панель графа с новой матрицей
+        graphDraw = new GraphPanel(matrix, size);
+        graphPanel.add(graphDraw); // Добавляем панель графа с новой матрицей
         graphPanel.revalidate(); // Перекомпоновываем компоненты
         graphPanel.repaint(); // Перерисовываем компоненты
     }

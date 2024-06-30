@@ -64,23 +64,23 @@ public class GraphDrawingPanel extends JPanel {
         // Рисуем ребра
         // g2.setColor(Color.RED); - чтобы цифры и ребра были разного цвета
         for (Edge edge : edges) {
-            g2.setColor(Color.RED);
+            g2.setColor(Color.BLACK);
             Point p1 = points.get(edge.src);
             Point p2 = points.get(edge.dest);
             g2.draw(new Line2D.Double(p1.x, p1.y, p2.x, p2.y));
             int weightX = (p1.x + p2.x) / 2;
             int weightY = (p1.y + p2.y) / 2;
-            g2.setColor(Color.BLACK);
+            g2.setColor(Color.BLUE);
             g2.drawString(String.valueOf(edge.weight), weightX, weightY);
         }
         // Рисуем вершины
-        g2.setColor(Color.BLUE);
+        g2.setColor(Color.getHSBColor(0.65206814F, 0.5829787F, 0.92156863F));
         int i = 0;
         for (Point point : points) {
             g2.fillOval(point.x - 15, point.y - 15, 30, 30);
             g2.setColor(Color.BLACK);
             g2.drawString(String.valueOf(i), point.x - 5, point.y + 5);
-            g2.setColor(Color.BLUE);
+            g2.setColor(Color.getHSBColor(0.65206814F, 0.5829787F, 0.92156863F));
             i++;
         }
     }
