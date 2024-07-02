@@ -10,7 +10,9 @@ import java.util.Map;
 public class GraphDrawingPanel extends JPanel {
     private ArrayList<Point> points;
     private ArrayList<Edge> edges;
-    private Point tempPoint;
+    private Point tempPoint;    // выделенная вершина
+    int tempPointIndex = -1;    // индекс выделенной вершины
+    private Edge tempEdge;
     private int[][] graph;
     private RoundedTextArea outputArea;     // Область для вывода результата выполнения алгоритма Прима
     private RoundedPanel drawingPanel;
@@ -61,11 +63,11 @@ public class GraphDrawingPanel extends JPanel {
         RoundedButton saveGraphButton = new RoundedButton("Save graph", 25, new Color(50, 98, 255), 14);
         saveGraphButton.addActionListener(e -> SaveGraph()); // Добавляем обработчик нажатия кнопки
         RoundedButton deleteNodeButton = new RoundedButton("Delete node", 25, new Color(255, 67, 50), 14);
-        //deleteNodeButton.addActionListener(e -> deleteNode());
+        deleteNodeButton.addActionListener(e -> deleteNode());
         RoundedButton deleteEdgeButton = new RoundedButton("Delete edge", 25, new Color(255, 67, 50), 14);
-        //deleteEdgeButton.addActionListener(e -> deleteEdge());
+        deleteEdgeButton.addActionListener(e -> deleteEdge());
         RoundedButton deleteGraphButton = new RoundedButton("Delete graph", 25, new Color(255, 67, 50), 14);
-        //deleteGraphButton.addActionListener(e -> deleteGraph());
+        deleteGraphButton.addActionListener(e -> deleteGraph());
 
         graphButtonPanel.add(saveGraphButton);
         graphButtonPanel.add(deleteNodeButton);
@@ -82,19 +84,24 @@ public class GraphDrawingPanel extends JPanel {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
                 // Рисуем ребра
-                g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
                 g2.setFont(new Font("Arial", Font.BOLD, 14));
                 for (Edge edge : edges) {
-                    g2.setColor(Color.BLACK);
                     Point p1 = points.get(edge.src);
                     Point p2 = points.get(edge.dest);
                     if (edge.src > edge.dest){ // чтобы веса были с одной стороны
                         p2 = p1;
                         p1 = points.get(edge.dest);
                     }
+                    if (tempEdge != null && tempEdge.src == edge.src && tempEdge.dest == edge.dest) {
+                        g2.setColor(new Color(253, 149, 74));
+                        g2.setStroke(new BasicStroke(6)); // Устанавливаем толщину линии для ребер
+                        g2.drawLine(p1.x, p1.y, p2.x, p2.y);
+                    }
+                    g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
+                    g2.setColor(Color.BLACK);
                     g2.draw(new Line2D.Double(p1.x, p1.y, p2.x, p2.y));
-                    int weightX = (int) (p1.x * 0.75 + p2.x * 0.25);
-                    int weightY = (int) (p1.y * 0.75 + p2.y * 0.25);
+                    int weightX = (int) (p1.x * 0.7 + p2.x * 0.3);
+                    int weightY = (int) (p1.y * 0.7 + p2.y * 0.3);
                     g2.setColor(Color.BLUE);
                     g2.drawString(String.valueOf(edge.weight), weightX, weightY);
                 }
@@ -102,6 +109,11 @@ public class GraphDrawingPanel extends JPanel {
                 g2.setColor(new Color(115, 64, 254));
                 int i = 0;
                 for (Point point : points) {
+                    if (i == tempPointIndex){
+                        g2.setColor(new Color(253, 149, 74));
+                        g2.fillOval(point.x - 19, point.y - 19, 38, 38);
+                        g2.setColor(new Color(115, 64, 254));
+                    }
                     g2.fillOval(point.x - 15, point.y - 15, 30, 30);
                     g2.setColor(Color.BLACK);
                     g2.drawString(String.valueOf(i), point.x - 5, point.y + 5);
@@ -118,20 +130,43 @@ public class GraphDrawingPanel extends JPanel {
                         points.add(e.getPoint());
                     } else if (SwingUtilities.isRightMouseButton(e)) {
                         Point clickedPoint = e.getPoint();
+                        tempEdge = isPointOnEdge(clickedPoint);
                         int clickedIndex = findPointIndex(clickedPoint);
                         if (clickedIndex != -1) {
+                            tempEdge = null; // если выделена вершина, то ребро не выделено
                             if (tempPoint == null) {
                                 tempPoint = clickedPoint;
+                                tempPointIndex = findPointIndex(tempPoint);
                             } else {
                                 int tempIndex = findPointIndex(tempPoint);
                                 if (tempIndex != -1) {
-                                    edges.add(new Edge(tempIndex, clickedIndex, 1));
+                                    String weightStr = JOptionPane.showInputDialog(
+                                            GraphDrawingPanel.this,
+                                            "Enter the weight of the edge:",
+                                            "Input Edge Weight",
+                                            JOptionPane.PLAIN_MESSAGE
+                                    );
+
+                                    if (weightStr != null) {
+                                        try {
+                                            int weight = Integer.parseInt(weightStr);
+                                            edges.add(new Edge(tempIndex, clickedIndex, weight));
+                                        } catch (NumberFormatException ex) {
+                                            JOptionPane.showMessageDialog(
+                                                    GraphDrawingPanel.this,
+                                                    "Invalid input. Please enter an integer value.",
+                                                    "Input Error",
+                                                    JOptionPane.ERROR_MESSAGE
+                                            );
+                                        }
+                                    }
                                 }
                                 tempPoint = null;
+                                tempPointIndex = points.size() + 1;
                             }
                         } else {
                             tempPoint = null;
-                            JOptionPane.showMessageDialog(GraphDrawingPanel.this, "Please click on an existing vertex to create an edge.", "Error", JOptionPane.ERROR_MESSAGE);
+                            tempPointIndex = -1;
                         }
                     }
                     repaint();
@@ -155,6 +190,26 @@ public class GraphDrawingPanel extends JPanel {
             }
         }
         return -1;
+    }
+
+    public Edge isPointOnEdge(Point point) {
+        double buffer = 5.0; // Допустимое отклонение для учета погрешности
+        for (Edge edge : edges) {
+            Point p1 = points.get(edge.src);
+            Point p2 = points.get(edge.dest);
+
+            // Проверка, что точка находится на линии
+            double lineDistance = Line2D.ptSegDist(p1.x, p1.y, p2.x, p2.y, point.x, point.y);
+            if (lineDistance > buffer) {
+                continue;
+            }
+            // Проверка, что точка находится между p1 и p2
+            if (Math.min(p1.x, p2.x) - buffer <= point.x && point.x <= Math.max(p1.x, p2.x) + buffer &&
+                    Math.min(p1.y, p2.y) - buffer <= point.y && point.y <= Math.max(p1.y, p2.y) + buffer){
+                return edge;
+            }
+        }
+        return null;
     }
 
     private void StepForward(){
@@ -196,7 +251,7 @@ public class GraphDrawingPanel extends JPanel {
         g2.draw(new Line2D.Double(points.get(i).x, points.get(i).y, points.get(j).x, points.get(j).y));
 
         // Вычисляем координаты для размещения веса ребра
-        double offsetFactor = 0.25; // Чем больше значение, тем ближе к первой вершине
+        double offsetFactor = 0.3; // Чем больше значение, тем ближе к первой вершине
         int weightX = (int) ((1 - offsetFactor) * points.get(i).x + offsetFactor * points.get(j).x);
         int weightY = (int) ((1 - offsetFactor) * points.get(i).y + offsetFactor * points.get(j).y);
         // Рисуем вес ребра
@@ -253,5 +308,31 @@ public class GraphDrawingPanel extends JPanel {
             outputArea.setText(messages.get(i));
             currentStep++;
         }
+    }
+
+    private void deleteGraph(){
+        points.clear();
+        edges.clear();
+        edgesMST.clear();
+        messages.clear();
+        tempPoint = null;
+        tempPointIndex = -1;
+        repaint();
+    }
+
+    private void deleteNode(){
+        if (tempPoint != null) {
+            points.remove(tempPointIndex);
+            edges.removeIf(edge -> edge.src == tempPointIndex || edge.dest == tempPointIndex);
+            tempPoint = null;
+            tempPointIndex = -1;
+            repaint();
+        }
+    }
+
+    private void deleteEdge(){
+        edges.remove(tempEdge);
+        tempEdge = null;
+        repaint();
     }
 }
