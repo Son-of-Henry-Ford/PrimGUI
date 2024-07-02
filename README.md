@@ -61,17 +61,17 @@ end while
 
 
 ### 1) Drawing input
-![Рисунок 1 – Прототип Drawing input](https://github.com/Son-of-Henry-Ford/PrimGUI/blob/tmp/pictures/DrawingInput.png)
+![Рисунок 1 – Прототип Drawing input](https://github.com/Son-of-Henry-Ford/PrimGUI/blob/main/pictures/DrawingInput.png)
 
 Пользователь задаёт граф, используя мышь (ЛКМ - добавить вершину, ПКМ - выбрать вершину инцидентную ребру). При добавлении ребра пользователю будет предложено задать его вес. Также есть возможность удалить граф, удалить отдельную вершину с инцидентными ей рёбрами или удалить ребро с помощью кнопок Delete graph, Delete Node и Delete Edge соответственно.
 
 
 ### 2) Matrix input:
-![Рисунок 2 – Прототип Matrix input](https://github.com/Son-of-Henry-Ford/PrimGUI/blob/tmp/pictures/MatrixInput.png)
+![Рисунок 2 – Прототип Matrix input](https://github.com/Son-of-Henry-Ford/PrimGUI/blob/main/pictures/MatrixInput.png)
 
 Пользователь задаёт размер матрицы смежности, затем заполняет её в соответствии с требованиями: должна быть симметричной, содержать неотрицательные веса рёбер.
 ### 3) File input:
-![Рисунок 3 – Прототип Fileinput](https://github.com/Son-of-Henry-Ford/PrimGUI/blob/tmp/pictures/FileInput.png)
+![Рисунок 3 – Прототип Fileinput](https://github.com/Son-of-Henry-Ford/PrimGUI/blob/main/pictures/FileInput.png)
 	Пользователь, после нажатия клавиши Fileinput программа переключается в режим работы с файлом, далее с помощью кнопки Load Matrix From File запускается  файловый менеджер, с помощью которого выбирается файл, который должен содержать матрицу смежности, отформатированную в соответствии с требованиями: веса в матрице разделены пробелами, строки матрицы разделены переносом строки.
  
 #### 2. Запуск алгоритма
