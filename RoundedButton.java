@@ -8,7 +8,7 @@ public class RoundedButton extends JButton {
     private Color buttonColor;
     //private Color textColor;
 
-    public RoundedButton(String text, int radius, Color buttonColor) {
+    public RoundedButton(String text, int radius, Color buttonColor, int size) {
         super(text);
         this.cornerRadius = radius;
         this.buttonColor = buttonColor;
@@ -16,6 +16,14 @@ public class RoundedButton extends JButton {
         setContentAreaFilled(false); // Отключаем стандартное заполнение кнопки
         setFocusPainted(false); // Убираем рамку фокуса
         setBorderPainted(false); // Убираем стандартную границу
+        setFont(new Font("", Font.BOLD, size)); // Устанавливаем размер текста
+    }
+
+    public RoundedButton(ImageIcon icon, int radius, Color color) {
+        super(icon);
+        this.cornerRadius = radius;
+        this.buttonColor = color;
+        setContentAreaFilled(false);
     }
 
     @Override

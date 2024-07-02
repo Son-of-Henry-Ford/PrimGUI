@@ -9,6 +9,7 @@ public class RoundedTextArea extends JTextArea {
         super(rows, columns);
         this.cornerRadius = cornerRadius;
         setOpaque(false); // Сделать компонент прозрачным для отображения закругленных углов
+        setMargin(new Insets(20, 20, 20, 20)); // Устанавливаем отступы в 10 пикселей со всех сторон
     }
 
     @Override
@@ -18,7 +19,7 @@ public class RoundedTextArea extends JTextArea {
 
         // Установить цвет фона
         g2.setColor(getBackground());
-        g2.fill(new RoundRectangle2D.Float(5, 5, getWidth()-10, getHeight()-10, cornerRadius, cornerRadius));
+        g2.fill(new RoundRectangle2D.Float(10, 10, getWidth()-20, getHeight()-20, cornerRadius, cornerRadius));
 
         // Нарисовать текст
         super.paintComponent(g2);
@@ -32,7 +33,7 @@ public class RoundedTextArea extends JTextArea {
 
         // Установить цвет границы
         g2.setColor(getBackground());
-        g2.draw(new RoundRectangle2D.Float(5, 5, getWidth()-10, getHeight()-10, cornerRadius, cornerRadius));
+        g2.draw(new RoundRectangle2D.Float(10, 10, getWidth()-20, getHeight()-20, cornerRadius, cornerRadius));
 
         g2.dispose();
     }
@@ -40,6 +41,6 @@ public class RoundedTextArea extends JTextArea {
     @Override
     public void updateUI() {
         super.updateUI();
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        //setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     }
 }

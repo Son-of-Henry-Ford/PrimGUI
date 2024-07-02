@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -15,7 +17,10 @@ public class AdjMatrixFromFilePanel extends JPanel {
     private RoundedPanel graphPanel; // Панель для отображения графа
     private int size; // Размер матрицы
     private GraphPanel graphDraw;
-    private int speed = 1;
+    private java.util.List<Edge> edges = new ArrayList<>(); // список ребер мод
+    private List<String> messages = new ArrayList<>(); // список сообщений мод
+    private int currentStep = 0; // текущий шаг мод
+
 
     public AdjMatrixFromFilePanel() {
         setLayout(new GridBagLayout()); // Устанавливаем компоновщик GridBagLayout для главной панели
@@ -23,7 +28,7 @@ public class AdjMatrixFromFilePanel extends JPanel {
 
         // Панель для кнопки загрузки
         JPanel loadPanel = new JPanel();
-        RoundedButton loadButton = new RoundedButton("Load Matrix from File", 25, new Color(50, 98, 255));
+        RoundedButton loadButton = new RoundedButton("Load Matrix from File", 25, new Color(50, 98, 255), 14);
         loadButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -34,21 +39,9 @@ public class AdjMatrixFromFilePanel extends JPanel {
         loadPanel.add(loadButton);
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridwidth = 4;
+        gbc.fill = GridBagConstraints.CENTER;
         add(loadPanel, gbc);
-
-        JPanel settingPanel = new JPanel();
-
-        JLabel speedLabel = new JLabel("Speed of changing steps:");
-        RoundedTextArea speedField = new RoundedTextArea(1, 3, 15);
-        RoundedButton setSpeedButton = new RoundedButton("Set speed", 25, new Color(50, 98, 255));
-
-        loadPanel.add(speedLabel);
-        loadPanel.add(speedField);
-        loadPanel.add(setSpeedButton);
-
-        add(settingPanel, gbc);
 
         // Область для вывода результата
         outputArea = new RoundedTextArea(10, 35, 25);
@@ -57,51 +50,58 @@ public class AdjMatrixFromFilePanel extends JPanel {
         scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Убираем черную рамку вокруг области
         gbc.gridx = 1;
         gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.fill = GridBagConstraints.CENTER;
+        gbc.gridwidth = 4;
+        gbc.fill = GridBagConstraints.BOTH;
         add(scrollPane, gbc); // Добавляем прокручиваемую панель на восток главной панели
 
         // Панель для отображения графа
         graphPanel = new RoundedPanel(new FlowLayout(), 25, Color.WHITE);
         gbc.gridx = 0;
         gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.gridheight = 2;
+        gbc.gridwidth = 3;
+        gbc.gridheight = 4;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         add(graphPanel, gbc);
 
-        // Перемещаем кнопку Calculate MST и Draw Graph в отдельную панель снизу
-        JPanel bottomPanel = new JPanel();
-        RoundedButton calculateButton = new RoundedButton("Calculate MST", 25, new Color(50, 98, 255));
-        calculateButton.addActionListener(e -> calculateMST()); // Добавляем обработчик нажатия кнопки
-        bottomPanel.add(calculateButton);
-        RoundedButton drawGraphButton = new RoundedButton("Draw Graph", 25, new Color(50, 98, 255));
-        drawGraphButton.addActionListener(e -> drawGraph()); // Добавляем обработчик нажатия кнопки
-        bottomPanel.add(drawGraphButton);
+        JPanel stepButtonPanel = new JPanel();
+        stepButtonPanel.setLayout(new BoxLayout(stepButtonPanel, BoxLayout.Y_AXIS));
+        stepButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Устанавливаем отступы
 
+        RoundedButton setStepButton = new RoundedButton(" \u276F ", 25, new Color(50, 98, 255), 20);
+        setStepButton.addActionListener(e -> StepForward()); // Добавляем обработчик нажатия кнопки
+        RoundedButton setBackButton = new RoundedButton(" \u276E ", 25, new Color(50, 98, 255), 20);
+        setBackButton.addActionListener(e -> StepBack()); // Добавляем обработчик нажатия кнопки
+        RoundedButton calculateButton = new RoundedButton("\u276F\u276F", 25, new Color(50, 98, 255), 20);
+        calculateButton.addActionListener(e -> calculateMST()); // Добавляем обработчик нажатия кнопки
+
+        stepButtonPanel.add(Box.createVerticalStrut(30));
+        stepButtonPanel.add(setStepButton);
+        stepButtonPanel.add(Box.createVerticalStrut(30));
+        stepButtonPanel.add(setBackButton);
+        stepButtonPanel.add(Box.createVerticalStrut(30));
+        stepButtonPanel.add(calculateButton);
+
+        gbc.gridheight = 1;
+        gbc.gridy = 2;
+        gbc.gridx = 3;
+        gbc.gridwidth = 1;
         gbc.weightx = 0.0;
         gbc.weighty = 0.0;
-        gbc.gridwidth = 2;
-        gbc.gridheight = 1;
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(bottomPanel, gbc);
+        add(stepButtonPanel, gbc);
 
-        // Обработчик нажатия кнопки установки скорости
-        setSpeedButton.addActionListener(e -> {
-            try {
-                speed = Integer.parseInt(speedField.getText()); // Преобразуем текст из поля ввода в целое число
-                if (speed < 0) {
-                    JOptionPane.showMessageDialog(this, "Please enter a number greater than 0.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (NumberFormatException ex) {
-                // Если введено не число, показываем сообщение об ошибке
-                JOptionPane.showMessageDialog(this, "Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        JPanel graphButtonPanel = new JPanel();
+
+        RoundedButton drawGraphButton = new RoundedButton("Draw Graph", 20, new Color(50, 98, 255), 14);
+        drawGraphButton.addActionListener(e -> drawGraph()); // Добавляем обработчик нажатия кнопки
+        graphButtonPanel.add(drawGraphButton);
+
+        gbc.gridy = 6;
+        gbc.gridx = 0;
+        gbc.gridwidth = 4;
+
+        add(graphButtonPanel, gbc);
     }
 
     // Метод для вычисления MST и вывода результата
@@ -110,32 +110,15 @@ public class AdjMatrixFromFilePanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Please draw graph fist", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        PrimAlgorithm prim = new PrimAlgorithm(matrix, size); // Создаем объект алгоритма Прима
-        Map<Edge, String> mstMap = prim.primMST();
-
         Graphics g = graphPanel.getGraphics();
 
-        int delay = speed*1000; // Задержка в миллисекундах (2 секунды)
-        // Создаем новый поток для выполнения операций с GUI
-        SwingWorker<Void, Void> worker = new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                for (Edge edge : mstMap.keySet()) {
-                    SwingUtilities.invokeAndWait(() -> {
-                        graphDraw.drawEdge(g, edge.src, edge.dest);
-                        outputArea.setText(mstMap.get(edge));
-                    });
-                    try {
-                        Thread.sleep(delay); // Задержка между итерациями цикла
-                    } catch (InterruptedException ex) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
-                return null;
-            }
-        };
-        worker.execute(); // Запускаем SwingWorker
+        // Создаем списки для ключей и значений
+        for (int i = currentStep; i < edges.size(); i++) {
+            Edge edge = edges.get(i);
+            graphDraw.drawEdge(g, edge.src, edge.dest, new Color(49, 168, 116), new Color(65, 199, 139));
+            outputArea.setText(messages.get(i));
+            currentStep++;
+        }
     }
 
     // Метод для рисования графа по матрице смежности
@@ -146,6 +129,14 @@ public class AdjMatrixFromFilePanel extends JPanel {
         graphPanel.add(graphDraw); // Добавляем панель графа с новой матрицей
         graphPanel.revalidate(); // Перекомпоновываем компоненты
         graphPanel.repaint(); // Перерисовываем компоненты
+
+        // Вычисляем МОД
+        PrimAlgorithm prim = new PrimAlgorithm(matrix, size); // Создаем объект алгоритма Прима
+        Map<Edge, String> mstMap = prim.primMST();
+
+        // Создаем списки для ключей и значений
+        edges = new ArrayList<>(mstMap.keySet());
+        messages = new ArrayList<>(mstMap.values());
     }
 
     private void loadMatrixFromFile() {
@@ -171,5 +162,31 @@ public class AdjMatrixFromFilePanel extends JPanel {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void StepForward(){
+        if (currentStep == edges.size()){
+            return; // здесь просто ничего не делать или попросить нарисовать граф?
+        }
+        Graphics g = graphPanel.getGraphics();
+        Edge edge = edges.get(currentStep);
+        graphDraw.drawEdge(g, edge.src, edge.dest, new Color(49, 168, 116), new Color(65, 199, 139));
+        outputArea.setText(messages.get(currentStep));
+        currentStep++;
+    }
+
+    private void StepBack(){
+        if (currentStep < 1){
+            return; // здесь просто ничего не делать или попросить нарисовать граф?
+        }
+        Graphics g = graphPanel.getGraphics();
+        currentStep--;
+        Edge edge = edges.get(currentStep);
+        graphDraw.drawEdge(g, edge.src, edge.dest, Color.BLACK,new Color(115, 64, 254));
+        if (currentStep == 0){
+            outputArea.setText("");
+            return;
+        }
+        outputArea.setText(messages.get(currentStep-1));
     }
 }
