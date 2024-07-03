@@ -45,6 +45,7 @@ public class GraphPanel extends JPanel {
 
         // Рисуем ребра
         g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
+        g2.setFont(new Font("Arial", Font.BOLD, 14));
         for (int i = 0; i < vertexCount; i++) {
             for (int j = i; j < vertexCount; j++) {
                 if (matrix[i][j] > 0) { // Проверяем, есть ли ребро между вершинами i и j
@@ -56,14 +57,14 @@ public class GraphPanel extends JPanel {
                     int weightX = (int) ((1 - offsetFactor) * points[i].x + offsetFactor * points[j].x);
                     int weightY = (int) ((1 - offsetFactor) * points[i].y + offsetFactor * points[j].y);
                     // Рисуем вес ребра
-                    g2.setFont(new Font("Arial", Font.BOLD, 12));
-                    g2.setColor(Color.BLUE);
+                    //g2.setFont(new Font("Arial", Font.BOLD, 12));
+                    g2.setColor(new Color(115, 64, 254));
                     g2.drawString(String.valueOf(matrix[i][j]), weightX, weightY);
                 }
             }
         }
         // Рисуем вершины
-        g2.setColor(new Color(50, 98, 255)); // Устанавливаем цвет для вершин
+        g2.setColor(new Color(115, 64, 254)); // Устанавливаем цвет для вершин
         g2.setFont(new Font("Arial", Font.BOLD, 14));
         for (int i = 0; i < vertexCount; i++) {
             // Рисуем вершину в виде круга
@@ -71,7 +72,7 @@ public class GraphPanel extends JPanel {
             g2.setColor(Color.BLACK); // Устанавливаем цвет для текста
             // Рисуем номер вершины
             g2.drawString(String.valueOf(i), points[i].x - 5, points[i].y + 5);
-            g2.setColor(new Color(50, 98, 255)); // Возвращаем цвет для следующей вершины
+            g2.setColor(new Color(115, 64, 254)); // Возвращаем цвет для следующей вершины
         }
     }
 
@@ -93,8 +94,8 @@ public class GraphPanel extends JPanel {
         int weightX = (int) ((1 - offsetFactor) * points[i].x + offsetFactor * points[j].x);
         int weightY = (int) ((1 - offsetFactor) * points[i].y + offsetFactor * points[j].y);
         // Рисуем вес ребра
-        g2.setColor(Color.BLACK);
-        g2.setFont(new Font("Arial", Font.BOLD, 12));
+        g2.setColor(new Color(115, 64, 254));
+        g2.setFont(new Font("Arial", Font.BOLD, 14));
         if (i < j) { // Чтобы вес рисовался только с одной стороны
             g2.drawString(String.valueOf(matrix[i][j]), weightX, weightY);
         }else {

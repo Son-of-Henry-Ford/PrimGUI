@@ -97,7 +97,7 @@ public class GraphDrawingPanel extends JPanel {
                     }
                     if (tempEdge != null && tempEdge.src == edge.src && tempEdge.dest == edge.dest) {
                         g2.setColor(new Color(253, 149, 74));
-                        g2.setStroke(new BasicStroke(6)); // Устанавливаем толщину линии для ребер
+                        g2.setStroke(new BasicStroke(6)); // Устанавливаем толщину подсветки для ребра
                         g2.drawLine(p1.x, p1.y, p2.x, p2.y);
                     }
                     g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
@@ -105,7 +105,7 @@ public class GraphDrawingPanel extends JPanel {
                     g2.draw(new Line2D.Double(p1.x, p1.y, p2.x, p2.y));
                     int weightX = (int) (p1.x * 0.7 + p2.x * 0.3);
                     int weightY = (int) (p1.y * 0.7 + p2.y * 0.3);
-                    g2.setColor(Color.BLUE);
+                    g2.setColor(new Color(115, 64, 254));
                     g2.drawString(String.valueOf(edge.weight), weightX, weightY);
                 }
                 // Рисуем вершины
@@ -139,7 +139,33 @@ public class GraphDrawingPanel extends JPanel {
                         }
                     } else if (SwingUtilities.isRightMouseButton(e)) {
                         Point clickedPoint = e.getPoint();
-                        tempEdge = isPointOnEdge(clickedPoint);
+                        Edge clickedEdge = isPointOnEdge(clickedPoint);
+                        if (clickedEdge != null && tempEdge != null && tempEdge.dest == clickedEdge.dest  && tempEdge.src == clickedEdge.src) {
+                            String weightStr = JOptionPane.showInputDialog(
+                                    GraphDrawingPanel.this,
+                                    "Enter the weight of the edge:",
+                                    "Input Edge Weight",
+                                    JOptionPane.PLAIN_MESSAGE
+                            );
+                            if (weightStr != null) {
+                                try {
+                                    int weight = Integer.parseInt(weightStr);
+                                    edges.remove(tempEdge);
+                                    edges.add(new Edge(tempEdge.src, tempEdge.dest, weight));
+                                } catch (NumberFormatException ex) {
+                                    JOptionPane.showMessageDialog(
+                                            GraphDrawingPanel.this,
+                                            "Invalid input. Please enter an integer value.",
+                                            "Input Error",
+                                            JOptionPane.ERROR_MESSAGE
+                                    );
+                                }
+                            }
+                            tempEdge = null; // после изменения веса отменяем выбор
+                        }else {
+                            tempEdge = isPointOnEdge(clickedPoint);
+                        }
+
                         int clickedIndex = findPointIndex(clickedPoint);
                         if (clickedIndex != -1) {
                             tempEdge = null; // если выделена вершина, то ребро не выделено
@@ -279,7 +305,7 @@ public class GraphDrawingPanel extends JPanel {
         int weightX = (int) ((1 - offsetFactor) * points.get(i).x + offsetFactor * points.get(j).x);
         int weightY = (int) ((1 - offsetFactor) * points.get(i).y + offsetFactor * points.get(j).y);
         // Рисуем вес ребра
-        g2.setColor(Color.BLACK);
+        g2.setColor(new Color(115, 64, 254));
         g2.setFont(new Font("Arial", Font.BOLD, 14));
         if (i < j) { // Чтобы вес рисовался только с одной стороны
             g2.drawString(String.valueOf(graph[i][j]), weightX, weightY);
@@ -295,6 +321,8 @@ public class GraphDrawingPanel extends JPanel {
         // Рисуем номера вершин
         g2.drawString(String.valueOf(i), points.get(i).x - 5, points.get(i).y + 5);
         g2.drawString(String.valueOf(j), points.get(j).x - 5, points.get(j).y + 5);
+
+        add(drawingPanel, BorderLayout.CENTER);
     }
 
     private void SaveGraph(){
@@ -308,6 +336,20 @@ public class GraphDrawingPanel extends JPanel {
             int weight = edge.weight;
             graph[start][end] = weight;
             graph[end][start] = weight; // Граф симметричный
+        }
+
+        switch (MatrixValidation.checkMatrix(graph)) {
+            case 0:
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(this, "Please fill all matrix fields with valid numbers.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            case 2:
+                JOptionPane.showMessageDialog(this, "The adjacency matrix must be symmetric.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            case 3:
+                JOptionPane.showMessageDialog(this, "The graph must be connected.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
         }
 
         PrimAlgorithm prim = new PrimAlgorithm(graph, graph.length); // Создаем объект алгоритма Прима
@@ -343,6 +385,7 @@ public class GraphDrawingPanel extends JPanel {
         tempRightPointIndex = -1;
         draggedPoint = null;
         draggedPointIndex = -1;
+        currentStep = 0;
         repaint();
         outputArea.setText("");
     }
@@ -355,6 +398,7 @@ public class GraphDrawingPanel extends JPanel {
             tempRightPointIndex = -1;
             draggedPoint = null;
             draggedPointIndex = -1;
+            currentStep = 0;
             repaint();
         }
     }
@@ -362,6 +406,7 @@ public class GraphDrawingPanel extends JPanel {
     private void deleteEdge(){
         edges.remove(tempEdge);
         tempEdge = null;
+        currentStep = 0;
         repaint();
     }
 }

@@ -179,7 +179,7 @@ class AdjacencyMatrixPanel extends JPanel {
                     if (num >= 0) {
                         matrix[i][j] = num;
                         matrix[j][i] = num;
-                    }else {
+                    } else {
                         JOptionPane.showMessageDialog(this, "Please enter non-negative numbers", "Error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
@@ -190,6 +190,22 @@ class AdjacencyMatrixPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Please fill all matrix fields with valid numbers.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        // Проверка валидности матрицы перед отрисовкой графа
+        switch (MatrixValidation.checkMatrix(matrix)) {
+            case 0:
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(this, "Please fill all matrix fields with valid numbers.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            case 2:
+                JOptionPane.showMessageDialog(this, "The adjacency matrix must be symmetric.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            case 3:
+                JOptionPane.showMessageDialog(this, "The graph must be connected.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+        }
+
         graphPanel.removeAll(); // Удаляем все компоненты с панели графа
         graphPanel.setLayout(new BorderLayout()); // Устанавливаем компоновщик BorderLayout для панели графа
         graphDraw = new GraphPanel(matrix, size);
@@ -225,7 +241,7 @@ class AdjacencyMatrixPanel extends JPanel {
         Graphics g = graphPanel.getGraphics();
         currentStep--;
         Edge edge = edges.get(currentStep);
-        graphDraw.drawEdge(g, edge.src, edge.dest, Color.BLACK,new Color(115, 64, 254));
+        graphDraw.drawEdge(g, edge.src, edge.dest, Color.BLACK, new Color(115, 64, 254));
         if (currentStep == 0){
             outputArea.setText("");
             return;
