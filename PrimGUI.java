@@ -61,7 +61,7 @@ public class PrimGUI extends JFrame {
 
     private void showHelpWindow() {
         JFrame helpFrame = new JFrame("Help");
-        helpFrame.setSize(400, 450);
+        helpFrame.setSize(400, 400);
         helpFrame.setLayout(new BorderLayout());
 
         JTextPane helpTextPane = new JTextPane();
@@ -76,9 +76,7 @@ public class PrimGUI extends JFrame {
                 "<h2>Help:</h2>" +
                 "<p><b>1. Drawing Input:</b><br>" +
                 "Left click to create vertex<br>" +
-                "To move a vertex, hold down the vertex with the left mouse button and drag<br>" +
-                "Right click selects vertices or edges: to draw an edge, select 2 edges in succession<br>" +
-                "To delete a vertex/edge, you must first select them, and then click the corresponding button from below</p>" +
+                "Right click selects vertices: to draw an edge, select 2 edges in succession</p>" +
                 "<p><b>2. Matrix Input:</b><br>" +
                 "1) Choose the matrix size<br>" +
                 "2) Fill out the adjacency matrix<br>" +

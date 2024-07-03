@@ -123,6 +123,19 @@ public class AdjMatrixFromFilePanel extends JPanel {
 
     // Метод для рисования графа по матрице смежности
     private void drawGraph() {
+        switch (MatrixValidation.checkMatrix(matrix)) {
+            case 0:
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(this, "Please fill all matrix fields with valid numbers.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            case 2:
+                JOptionPane.showMessageDialog(this, "The adjacency matrix must be symmetric.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            case 3:
+                JOptionPane.showMessageDialog(this, "The graph must be connected.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+        }
         graphPanel.removeAll(); // Удаляем все компоненты с панели графа
         graphPanel.setLayout(new BorderLayout()); // Устанавливаем компоновщик BorderLayout для панели графа
         graphDraw = new GraphPanel(matrix, size);
@@ -158,7 +171,12 @@ public class AdjMatrixFromFilePanel extends JPanel {
                     }
                     lineCount++;
                 }
-            } catch (IOException e) {
+            }
+            catch (NumberFormatException e) {
+               JOptionPane.showMessageDialog(this, "Please fill all matrix fields with valid numbers.", "Error", JOptionPane.ERROR_MESSAGE);
+                // return; // вроде не требуется
+            }
+            catch (IOException e) {
                 e.printStackTrace();
             }
         }
