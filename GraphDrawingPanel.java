@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +11,10 @@ import java.util.Map;
 public class GraphDrawingPanel extends JPanel {
     private ArrayList<Point> points;
     private ArrayList<Edge> edges;
-    private Point tempPoint;    // выделенная вершина
-    int tempPointIndex = -1;    // индекс выделенной вершины
+    private Point tempRightPoint;    // выделенная вершина
+    int tempRightPointIndex = -1;    // индекс выделенной вершины
+    private Point draggedPoint = null; // вершина, которую зажали ЛКМ
+    private int draggedPointIndex = -1; // индекс вершины, которую зажали ЛКМ
     private Edge tempEdge;
     private int[][] graph;
     private RoundedTextArea outputArea;     // Область для вывода результата выполнения алгоритма Прима
@@ -27,7 +30,7 @@ public class GraphDrawingPanel extends JPanel {
 
         points = new ArrayList<>();
         edges = new ArrayList<>();
-        tempPoint = null;
+        tempRightPoint = null;
 
         outputArea = new RoundedTextArea(10, 35, 25);
         outputArea.setEditable(false);
@@ -109,7 +112,7 @@ public class GraphDrawingPanel extends JPanel {
                 g2.setColor(new Color(115, 64, 254));
                 int i = 0;
                 for (Point point : points) {
-                    if (i == tempPointIndex){
+                    if (i == tempRightPointIndex){
                         g2.setColor(new Color(253, 149, 74));
                         g2.fillOval(point.x - 19, point.y - 19, 38, 38);
                         g2.setColor(new Color(115, 64, 254));
@@ -127,18 +130,24 @@ public class GraphDrawingPanel extends JPanel {
             public void mousePressed(MouseEvent e) {
                 if (isWithinDrawingArea(e.getX(), e.getY())) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
-                        points.add(e.getPoint());
+                        int clickedIndex = findPointIndex(e.getPoint());
+                        if (clickedIndex != -1) {
+                            draggedPoint = points.get(clickedIndex);
+                            draggedPointIndex = clickedIndex;
+                        } else {
+                            points.add(e.getPoint());
+                        }
                     } else if (SwingUtilities.isRightMouseButton(e)) {
                         Point clickedPoint = e.getPoint();
                         tempEdge = isPointOnEdge(clickedPoint);
                         int clickedIndex = findPointIndex(clickedPoint);
                         if (clickedIndex != -1) {
                             tempEdge = null; // если выделена вершина, то ребро не выделено
-                            if (tempPoint == null) {
-                                tempPoint = clickedPoint;
-                                tempPointIndex = findPointIndex(tempPoint);
+                            if (tempRightPoint == null) {
+                                tempRightPoint = clickedPoint;
+                                tempRightPointIndex = findPointIndex(tempRightPoint);
                             } else {
-                                int tempIndex = findPointIndex(tempPoint);
+                                int tempIndex = findPointIndex(tempRightPoint);
                                 if (tempIndex != -1) {
                                     String weightStr = JOptionPane.showInputDialog(
                                             GraphDrawingPanel.this,
@@ -161,14 +170,29 @@ public class GraphDrawingPanel extends JPanel {
                                         }
                                     }
                                 }
-                                tempPoint = null;
-                                tempPointIndex = points.size() + 1;
+                                tempRightPoint = null;
+                                tempRightPointIndex = points.size() + 1;
                             }
                         } else {
-                            tempPoint = null;
-                            tempPointIndex = -1;
+                            tempRightPoint = null;
+                            tempRightPointIndex = -1;
                         }
                     }
+                    repaint();
+                }
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                draggedPoint = null;
+                draggedPointIndex = -1;
+            }
+        });
+
+        drawingPanel.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (draggedPoint != null && draggedPointIndex != -1) {
+                    draggedPoint.setLocation(e.getPoint());
                     repaint();
                 }
             }
@@ -293,14 +317,14 @@ public class GraphDrawingPanel extends JPanel {
         edgesMST = new ArrayList<>(mstMap.keySet());
         messages = new ArrayList<>(mstMap.values());
     }
-    // Метод для вывода результата
+    // Метод сразу рисует МОД
     private void calculateMST() {
         // при пустом графе выдавать ошибку?
         /*if (edgesMST.isEmpty()){
             JOptionPane.showMessageDialog(this, "Please draw graph fist", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }*/
-
+        currentStep = 0;
         // Создаем списки для ключей и значений
         for (int i = 0; i < edgesMST.size(); i++) {
             Edge edge = edgesMST.get(i);
@@ -315,17 +339,22 @@ public class GraphDrawingPanel extends JPanel {
         edges.clear();
         edgesMST.clear();
         messages.clear();
-        tempPoint = null;
-        tempPointIndex = -1;
+        tempRightPoint = null;
+        tempRightPointIndex = -1;
+        draggedPoint = null;
+        draggedPointIndex = -1;
         repaint();
+        outputArea.setText("");
     }
 
     private void deleteNode(){
-        if (tempPoint != null) {
-            points.remove(tempPointIndex);
-            edges.removeIf(edge -> edge.src == tempPointIndex || edge.dest == tempPointIndex);
-            tempPoint = null;
-            tempPointIndex = -1;
+        if (tempRightPoint != null) {
+            points.remove(tempRightPointIndex);
+            edges.removeIf(edge -> edge.src == tempRightPointIndex || edge.dest == tempRightPointIndex);
+            tempRightPoint = null;
+            tempRightPointIndex = -1;
+            draggedPoint = null;
+            draggedPointIndex = -1;
             repaint();
         }
     }
