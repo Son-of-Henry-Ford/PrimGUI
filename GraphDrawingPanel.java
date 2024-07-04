@@ -101,7 +101,7 @@ public class GraphDrawingPanel extends JPanel {
                         g2.drawLine(p1.x, p1.y, p2.x, p2.y);
                     }
                     g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
-                    g2.setColor(Color.BLACK);
+                    g2.setColor(new Color(115, 64, 254).darker());
                     g2.draw(new Line2D.Double(p1.x, p1.y, p2.x, p2.y));
                     int weightX = (int) (p1.x * 0.7 + p2.x * 0.3);
                     int weightY = (int) (p1.y * 0.7 + p2.y * 0.3);
@@ -115,6 +115,18 @@ public class GraphDrawingPanel extends JPanel {
                     if (i == tempRightPointIndex){
                         g2.setColor(new Color(253, 149, 74));
                         g2.fillOval(point.x - 19, point.y - 19, 38, 38);
+                        g2.setColor(new Color(115, 64, 254));
+                    }
+                    if (i == 0){
+                        g2.setColor(new Color(65, 199, 139));
+                        g2.fillOval(point.x - 15, point.y - 15, 30, 30);
+                        g2.setColor(Color.BLACK);
+                        g2.drawString(String.valueOf(i), point.x - 5, point.y + 5);
+                        g2.setColor(new Color(115, 64, 254));
+                    } else {
+                        g2.fillOval(point.x - 15, point.y - 15, 30, 30);
+                        g2.setColor(Color.BLACK);
+                        g2.drawString(String.valueOf(i), point.x - 5, point.y + 5);
                         g2.setColor(new Color(115, 64, 254));
                     }
                     g2.fillOval(point.x - 15, point.y - 15, 30, 30);
@@ -174,7 +186,7 @@ public class GraphDrawingPanel extends JPanel {
                                 tempRightPointIndex = findPointIndex(tempRightPoint);
                             } else {
                                 int tempIndex = findPointIndex(tempRightPoint);
-                                if (tempIndex != -1) {
+                                if (tempIndex != -1 && tempIndex != clickedIndex) { // исключаем петли
                                     String weightStr = JOptionPane.showInputDialog(
                                             GraphDrawingPanel.this,
                                             "Enter the weight of the edge:",
@@ -182,7 +194,7 @@ public class GraphDrawingPanel extends JPanel {
                                             JOptionPane.PLAIN_MESSAGE
                                     );
 
-                                    if (weightStr != null) {
+                                    if (weightStr != null ) {
                                         try {
                                             int weight = Integer.parseInt(weightStr);
                                             edges.add(new Edge(tempIndex, clickedIndex, weight));
@@ -268,7 +280,7 @@ public class GraphDrawingPanel extends JPanel {
         }
 
         Edge edge = edgesMST.get(currentStep);
-        drawEdge(edge.src, edge.dest, new Color(49, 168, 116), new Color(65, 199, 139));
+        drawEdge(edge.src, edge.dest, new Color(65, 199, 139), new Color(65, 199, 139));
         outputArea.setText(messages.get(currentStep));
         currentStep++;
     }
@@ -279,7 +291,7 @@ public class GraphDrawingPanel extends JPanel {
         }
         currentStep--;
         Edge edge = edgesMST.get(currentStep);
-        drawEdge(edge.src, edge.dest, Color.BLACK,new Color(115, 64, 254));
+        drawEdge(edge.src, edge.dest, new Color(65, 199, 139), new Color(115, 64, 254));
         if (currentStep == 0){
             outputArea.setText("");
             return;
@@ -287,35 +299,20 @@ public class GraphDrawingPanel extends JPanel {
         outputArea.setText(messages.get(currentStep-1));
     }
 
-    public void drawEdge(int i, int j, Color edgeColor, Color vertexColor) {
-        if (i > j){ // чтобы с одной стороны цифры писались
-            int k = i;
-            i = j;
-            j = k;
-        }
+    public void drawEdge(int i, int j, Color oldColor, Color newColor) {
         Graphics2D g2 = (Graphics2D) drawingPanel.getGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g2.setColor(edgeColor); // Устанавливаем цвет линии для ребер
+        g2.setColor(newColor.darker()); // Устанавливаем цвет линии для ребер
         g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
+        g2.setFont(new Font("Arial", Font.BOLD, 14));
         g2.draw(new Line2D.Double(points.get(i).x, points.get(i).y, points.get(j).x, points.get(j).y));
 
-        // Вычисляем координаты для размещения веса ребра
-        double offsetFactor = 0.3; // Чем больше значение, тем ближе к первой вершине
-        int weightX = (int) ((1 - offsetFactor) * points.get(i).x + offsetFactor * points.get(j).x);
-        int weightY = (int) ((1 - offsetFactor) * points.get(i).y + offsetFactor * points.get(j).y);
-        // Рисуем вес ребра
-        g2.setColor(new Color(115, 64, 254));
-        g2.setFont(new Font("Arial", Font.BOLD, 14));
-        if (i < j) { // Чтобы вес рисовался только с одной стороны
-            g2.drawString(String.valueOf(graph[i][j]), weightX, weightY);
-        }else {
-            g2.drawString(String.valueOf(graph[j][i]), weightX, weightY);
-        }
-
-        g2.setColor(vertexColor); // Устанавливаем цвет для вершин
         // Рисуем вершины в виде круга поверх ребра
+        g2.setColor(oldColor); // Устанавливаем цвет для первой вершины
         g2.fillOval(points.get(i).x - 15, points.get(i).y - 15, 30, 30);
+
+        g2.setColor(newColor); // Устанавливаем цвет для второй вершины
         g2.fillOval(points.get(j).x - 15, points.get(j).y - 15, 30, 30);
         g2.setColor(Color.BLACK); // Устанавливаем цвет для текста
         // Рисуем номера вершин
@@ -336,6 +333,7 @@ public class GraphDrawingPanel extends JPanel {
             int weight = edge.weight;
             graph[start][end] = weight;
             graph[end][start] = weight; // Граф симметричный
+            graph[start][start] = 0;
         }
 
         switch (MatrixValidation.checkMatrix(graph)) {

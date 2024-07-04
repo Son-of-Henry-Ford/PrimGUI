@@ -191,7 +191,7 @@ public class AdjMatrixFromFilePanel extends JPanel {
         }
         Graphics g = graphPanel.getGraphics();
         Edge edge = edges.get(currentStep);
-        graphDraw.drawEdge(g, edge.src, edge.dest, new Color(49, 168, 116), new Color(65, 199, 139));
+        graphDraw.drawEdge(g, edge.src, edge.dest, new Color(65, 199, 139), new Color(65, 199, 139));
         outputArea.setText(messages.get(currentStep));
         currentStep++;
     }
@@ -203,7 +203,7 @@ public class AdjMatrixFromFilePanel extends JPanel {
         Graphics g = graphPanel.getGraphics();
         currentStep--;
         Edge edge = edges.get(currentStep);
-        graphDraw.drawEdge(g, edge.src, edge.dest, Color.BLACK,new Color(115, 64, 254));
+        graphDraw.drawEdge(g, edge.src, edge.dest, new Color(65, 199, 139), new Color(115, 64, 254));
         if (currentStep == 0){
             outputArea.setText("");
             return;

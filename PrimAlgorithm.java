@@ -101,7 +101,7 @@ public class PrimAlgorithm {
      * @param visitedNodes множество посещённых вершин
      * @return Строка с перечислением непосещенных вершин
      */
-    private static String getUnvisitedNodes(int n, Set<Integer> visitedNodes) {
+/*    private static String getUnvisitedNodes(int n, Set<Integer> visitedNodes) {
         StringBuilder unvisitedNodes = new StringBuilder("[");
         for (int i = 0; i < n; i++) {
             if (!visitedNodes.contains(i)) {
@@ -111,5 +111,5 @@ public class PrimAlgorithm {
         unvisitedNodes.deleteCharAt(unvisitedNodes.length() - 1); // Удаление последней запятой
         unvisitedNodes.append("]");
         return unvisitedNodes.toString();
-    }
+    }*/
 }

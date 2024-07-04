@@ -53,7 +53,7 @@ public class GraphPanel extends JPanel {
                     g2.setColor(Color.BLACK); // Устанавливаем цвет линии для ребер
                     g2.draw(new Line2D.Double(points[i].x, points[i].y, points[j].x, points[j].y));
                     // Вычисляем координаты для размещения веса ребра
-                    double offsetFactor = 0.25; // Чем больше значение, тем ближе к первой вершине
+                    double offsetFactor = 0.3; // Чем больше значение, тем ближе к первой вершине
                     int weightX = (int) ((1 - offsetFactor) * points[i].x + offsetFactor * points[j].x);
                     int weightY = (int) ((1 - offsetFactor) * points[i].y + offsetFactor * points[j].y);
                     // Рисуем вес ребра
@@ -76,40 +76,24 @@ public class GraphPanel extends JPanel {
         }
     }
 
-    public void drawEdge(Graphics g, int i, int j, Color edgeColor, Color vertexColor) {
-        if (i > j){ // чтобы с одной стороны цифры писались
-            int k = i;
-            i = j;
-            j = k;
-        }
+    public void drawEdge(Graphics g, int i, int j, Color oldColor, Color newColor) {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g2.setColor(edgeColor); // Устанавливаем цвет линии для ребер
+        g2.setColor(newColor.darker()); // Устанавливаем цвет линии для ребер
         g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
         g2.draw(new Line2D.Double(points[i].x, points[i].y, points[j].x, points[j].y));
-
-        // Вычисляем координаты для размещения веса ребра
-        double offsetFactor = 0.25; // Чем больше значение, тем ближе к первой вершине
-        int weightX = (int) ((1 - offsetFactor) * points[i].x + offsetFactor * points[j].x);
-        int weightY = (int) ((1 - offsetFactor) * points[i].y + offsetFactor * points[j].y);
-        // Рисуем вес ребра
-        g2.setColor(new Color(115, 64, 254));
         g2.setFont(new Font("Arial", Font.BOLD, 14));
-        if (i < j) { // Чтобы вес рисовался только с одной стороны
-            g2.drawString(String.valueOf(matrix[i][j]), weightX, weightY);
-        }else {
-            g2.drawString(String.valueOf(matrix[j][i]), weightX, weightY);
-        }
-
-        g2.setColor(vertexColor); // Устанавливаем цвет для вершин
 
         // Рисуем вершины в виде круга поверх ребра
+        g2.setColor(oldColor); // Устанавливаем цвет для первой вершины
         g2.fillOval(points[i].x - 15, points[i].y - 15, 30, 30);
+
+        g2.setColor(newColor); // Устанавливаем цвет для второй
         g2.fillOval(points[j].x - 15, points[j].y - 15, 30, 30);
+
         g2.setColor(Color.BLACK); // Устанавливаем цвет для текста
         // Рисуем номера вершин
-        g2.setFont(new Font("Arial", Font.BOLD, 14));
         g2.drawString(String.valueOf(i), points[i].x - 5, points[i].y + 5);
         g2.drawString(String.valueOf(j), points[j].x - 5, points[j].y + 5);
     }
