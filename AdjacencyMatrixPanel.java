@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.List;
@@ -142,11 +143,26 @@ class AdjacencyMatrixPanel extends JPanel {
                 matrixFields[i][j].setHorizontalAlignment(JTextField.CENTER); // Центрируем текст в поле ввода
                 matrixFields[i][j].setPreferredSize(cellSize); // Устанавливаем предпочтительный размер
                 matrixPanel.add(matrixFields[i][j]); // Добавляем поле ввода на панель матрицы
+                if(i == j){
+                    matrixFields[i][j].setText("0");
+                    matrixFields[i][j].setEditable(false);
+                    matrixFields[i][j].setBackground(Color.WHITE);
+                }
             }
         }
+        //Добавляем слушателей
+        addListenerToMatrixCells();
         // Перекомпоновываем и перерисовываем компоненты
         matrixPanel.revalidate();
         matrixPanel.repaint();
+    }
+    private void addListenerToMatrixCells(){
+        for(int i = 0; i < size; i++){
+            for(int j = i + 1; j < size; j++){
+            matrixFields[i][j].getDocument().addDocumentListener(new MyDocumentListener(matrixFields[i][j], matrixFields[j][i]));
+                matrixFields[j][i].getDocument().addDocumentListener(new MyDocumentListener(matrixFields[j][i], matrixFields[i][j]));
+            }
+        }
     }
 
     // Метод для вывода результата
