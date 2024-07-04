@@ -53,7 +53,7 @@ public class PrimAlgorithm {
                     continue;
                 }
                 for (int j = 0; j < n; j++) {
-                    if (visitedNodes.contains(j) || i == j || matrix[i][j] == 0) {
+                    if (visitedNodes.contains(j) || i == j || matrix[i][j] == 0){
                         continue;
                     }
                     // System.out.printf("%d, %d = %d   ", i, j, matrix[i][j]);
