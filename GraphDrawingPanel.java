@@ -349,7 +349,7 @@ public class GraphDrawingPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "The graph must be connected.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
         }
-
+        currentStep = 0;
         PrimAlgorithm prim = new PrimAlgorithm(graph, graph.length); // Создаем объект алгоритма Прима
         Map<Edge, String> mstMap = prim.primMST();
 
