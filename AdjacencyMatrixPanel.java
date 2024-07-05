@@ -159,7 +159,7 @@ class AdjacencyMatrixPanel extends JPanel {
     private void addListenerToMatrixCells(){
         for(int i = 0; i < size; i++){
             for(int j = i + 1; j < size; j++){
-            matrixFields[i][j].getDocument().addDocumentListener(new MyDocumentListener(matrixFields[i][j], matrixFields[j][i]));
+                matrixFields[i][j].getDocument().addDocumentListener(new MyDocumentListener(matrixFields[i][j], matrixFields[j][i]));
                 matrixFields[j][i].getDocument().addDocumentListener(new MyDocumentListener(matrixFields[j][i], matrixFields[i][j]));
             }
         }
@@ -176,7 +176,7 @@ class AdjacencyMatrixPanel extends JPanel {
         // Создаем списки для ключей и значений
         for (int i = 0; i < edges.size(); i++) {
             Edge edge = edges.get(i);
-            graphDraw.drawEdge(g, edge.src, edge.dest, new Color(49, 168, 116), new Color(65, 199, 139));
+            graphDraw.drawEdge(g, edge.src, edge.dest, new Color(65, 199, 139), new Color(65, 199, 139));
             outputArea.setText(messages.get(i));
             currentStep++;
         }

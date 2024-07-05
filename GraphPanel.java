@@ -44,7 +44,7 @@ public class GraphPanel extends JPanel {
         g2.fill(new RoundRectangle2D.Double(10, 10, getWidth() - 20, getHeight() - 20, 50, 50));
 
         // Рисуем ребра
-        g2.setStroke(new BasicStroke(3)); // Устанавливаем толщину линии для ребер
+        g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
         g2.setFont(new Font("Arial", Font.BOLD, 14));
         for (int i = 0; i < vertexCount; i++) {
             for (int j = i; j < vertexCount; j++) {
@@ -81,7 +81,7 @@ public class GraphPanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         g2.setColor(newColor.darker()); // Устанавливаем цвет линии для ребер
-        g2.setStroke(new BasicStroke(3)); // Устанавливаем толщину линии для ребер
+        g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
         g2.draw(new Line2D.Double(points[i].x, points[i].y, points[j].x, points[j].y));
         g2.setFont(new Font("Arial", Font.BOLD, 14));
 

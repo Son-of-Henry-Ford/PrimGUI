@@ -115,7 +115,7 @@ public class AdjMatrixFromFilePanel extends JPanel {
         // Создаем списки для ключей и значений
         for (int i = 0; i < edges.size(); i++) {
             Edge edge = edges.get(i);
-            graphDraw.drawEdge(g, edge.src, edge.dest, new Color(49, 168, 116), new Color(65, 199, 139));
+            graphDraw.drawEdge(g, edge.src, edge.dest, new Color(65, 199, 139), new Color(65, 199, 139));
             outputArea.setText(messages.get(i));
             currentStep++;
         }

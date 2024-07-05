@@ -100,7 +100,7 @@ public class GraphDrawingPanel extends JPanel {
                         g2.setStroke(new BasicStroke(6)); // Устанавливаем толщину подсветки для ребра
                         g2.drawLine(p1.x, p1.y, p2.x, p2.y);
                     }
-                    g2.setStroke(new BasicStroke(3)); // Устанавливаем толщину линии для ребер
+                    g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
                     g2.setColor(new Color(115, 64, 254).darker());
                     g2.draw(new Line2D.Double(p1.x, p1.y, p2.x, p2.y));
                     int weightX = (int) (p1.x * 0.7 + p2.x * 0.3);
@@ -118,7 +118,7 @@ public class GraphDrawingPanel extends JPanel {
                         g2.setColor(new Color(115, 64, 254));
                     }
                     if (i == 0){
-                        g2.setColor(new Color(102, 255, 117));
+                        g2.setColor(new Color(65, 199, 139));
                         g2.fillOval(point.x - 15, point.y - 15, 30, 30);
                         g2.setColor(Color.BLACK);
                         g2.drawString(String.valueOf(i), point.x - 5, point.y + 5);
@@ -194,7 +194,7 @@ public class GraphDrawingPanel extends JPanel {
                                             JOptionPane.PLAIN_MESSAGE
                                     );
 
-                                    if (weightStr != null ) {
+                                    if (weightStr != null) {
                                         try {
                                             int weight = Integer.parseInt(weightStr);
                                             edges.add(new Edge(tempIndex, clickedIndex, weight));
@@ -304,7 +304,7 @@ public class GraphDrawingPanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         g2.setColor(newColor.darker()); // Устанавливаем цвет линии для ребер
-        g2.setStroke(new BasicStroke(3)); // Устанавливаем толщину линии для ребер
+        g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
         g2.setFont(new Font("Arial", Font.BOLD, 14));
         g2.draw(new Line2D.Double(points.get(i).x, points.get(i).y, points.get(j).x, points.get(j).y));
 
@@ -368,7 +368,7 @@ public class GraphDrawingPanel extends JPanel {
         // Создаем списки для ключей и значений
         for (int i = 0; i < edgesMST.size(); i++) {
             Edge edge = edgesMST.get(i);
-            drawEdge(edge.src, edge.dest, new Color(49, 168, 116), new Color(65, 199, 139));
+            drawEdge(edge.src, edge.dest, new Color(65, 199, 139), new Color(65, 199, 139));
             outputArea.setText(messages.get(i));
             currentStep++;
         }

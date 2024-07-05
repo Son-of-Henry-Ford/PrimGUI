@@ -33,6 +33,7 @@ public class PrimAlgorithm {
         //Set<Edge> selectedEdges = new HashSet<>(); // не сохраняет порядок
         // Integer[][] res = new Integer[n][n];
         int[][] res = new int[n][n]; // будущая матирца смежности МОД
+        int MSTsize = 0;
 
         while (visitedNodes.size() != n) {
             // Сообщения об узлах можно не выводить, т.к. они буду наглядно раскрашены
@@ -72,6 +73,10 @@ public class PrimAlgorithm {
                 selectedEdges.add(new Edge(start, end, minEdge));
                 // System.out.printf("SELECTED EDGES = %s\n\n", selectedEdges);
                 curStep.append("SELECTED EDGES: " + selectedEdges);
+                MSTsize += matrix[start][end];
+                if (visitedNodes.size() + 1 == n) {
+                    curStep.append("\nTHE SIZE OF THE MST: " + MSTsize);
+                }
                 map.put(selectedEdges.getLast(), curStep.toString());
             }
             visitedNodes.add(end);
