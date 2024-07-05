@@ -100,7 +100,7 @@ public class GraphDrawingPanel extends JPanel {
                         g2.setStroke(new BasicStroke(6)); // Устанавливаем толщину подсветки для ребра
                         g2.drawLine(p1.x, p1.y, p2.x, p2.y);
                     }
-                    g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
+                    g2.setStroke(new BasicStroke(3)); // Устанавливаем толщину линии для ребер
                     g2.setColor(new Color(115, 64, 254).darker());
                     g2.draw(new Line2D.Double(p1.x, p1.y, p2.x, p2.y));
                     int weightX = (int) (p1.x * 0.7 + p2.x * 0.3);
@@ -304,7 +304,7 @@ public class GraphDrawingPanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         g2.setColor(newColor.darker()); // Устанавливаем цвет линии для ребер
-        g2.setStroke(new BasicStroke(2)); // Устанавливаем толщину линии для ребер
+        g2.setStroke(new BasicStroke(3)); // Устанавливаем толщину линии для ребер
         g2.setFont(new Font("Arial", Font.BOLD, 14));
         g2.draw(new Line2D.Double(points.get(i).x, points.get(i).y, points.get(j).x, points.get(j).y));
 
